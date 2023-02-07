@@ -1,6 +1,6 @@
 # Assignment five Java CompletableFuture (7%)
 
-**Due date Tuesday 26 April at 11:30 pm**
+**Due date Tuesday 14 April at 11:30 pm**
 
 ## Instructions
 
