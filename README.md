@@ -20,7 +20,7 @@ The goal of this assignment is to learn how to construct concurrent dataflow (a 
 Part of the program is given to you, and you complete the rest to make it a superannuatation/lifestyle calculator. The program accepts the full name of a person, and then estimates the super balance when the person retires, when the person will die, and how lavish or stingy the person's retirement lifestyle will be.
 
 Your final program should implement the following dataflow graph.
-<img src="https://elearn.waikato.ac.nz/pluginfile.php/2480626/mod_resource/content/1/mortality-dataflow.png" />
+<img src="https://elearn.waikato.ac.nz/pluginfile.php/2835057/mod_resource/content/1/mortality-dataflow.png" />
 
 Run the three test methods in completablefuture_assignment.Mortality.main() and experiment with GET and JOIN methods. Your task is to implement the "query"" method to set up the dataflow graph shown above, with each dataflow node running as a CompletableFuture async task in a thread pool. Upon receiving its input(s), each dataflow node starts executing, and then outputs its result, which may trigger the following dataflow nodes to start executing...
 
