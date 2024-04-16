@@ -174,7 +174,7 @@ public class Mortality {
     public static Integer WorkingYears(Integer retirement, Integer superAge) {
         return retirement - superAge;
     }
-    public static Integer retire(Integer retirementAge, Integer DeathAge) {
+    public static Integer RetirementYears(Integer retirementAge, Integer DeathAge) {
         return DeathAge - retirementAge;
     }
 
@@ -191,6 +191,13 @@ public class Mortality {
                 .supplyAsync(() -> PersonInfoSupplier.getPersonInfo(fullName));
         CompletableFuture<Integer> startSuperAge = CompletableFuture
                 .supplyAsync(SuperannuatationStrategySupplier::getStartSuperAge);
+//        try {
+//            System.out.println("	 start super age = " + startSuperAge.get());
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
         CompletableFuture<Integer> retirementAge = CompletableFuture
                 .supplyAsync(RetirementAgeSupplier);
 
@@ -199,7 +206,19 @@ public class Mortality {
         CompletableFuture<Integer> contribution = CompletableFuture
                 .supplyAsync(SuperannuatationStrategySupplier::getContribution);
 
+        CompletableFuture<Integer> WorkingYears = retirementAge.thenCombine(startSuperAge, Mortality::WorkingYears);
+        try {
+            System.out.println("	 start super age=" + startSuperAge.get());
+            System.out.println("	 retirement age=" + retirementAge.get());
+            System.out.println("Working years = " + WorkingYears.get());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        /*CompletableFuture<Integer> deathAge = personInfo.thenApply(Mortality::DeathYears);
 
+     */
 
 
     }
