@@ -169,6 +169,11 @@ public class Mortality {
     }
 
 
+    public static Integer WorkingYears(Integer retirement, Integer superAge) {
+        return retirement - superAge;
+    }
+
+
     /**
      * @param fullName a person's name
      *                 (see all the names in the "fullname" file in the project directory)
@@ -188,6 +193,9 @@ public class Mortality {
                 .supplyAsync(SuperannuatationStrategySupplier::getSuperStrategy);
         CompletableFuture<Integer> contribution = CompletableFuture
                 .supplyAsync(SuperannuatationStrategySupplier::getContribution);
+
+
+
 
     }
 
