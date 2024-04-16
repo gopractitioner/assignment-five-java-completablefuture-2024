@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -176,6 +177,8 @@ public class Mortality {
     public static void query(String fullName) {
         System.out.println(fullName);
         //write your implementation here
+        CompletableFuture<Optional<PersonInfo>> personInfo = CompletableFuture
+                .supplyAsync(() -> PersonInfoSupplier.getPersonInfo(fullName));
 
 
     }
