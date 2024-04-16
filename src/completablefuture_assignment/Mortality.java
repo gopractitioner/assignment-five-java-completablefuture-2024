@@ -168,7 +168,9 @@ public class Mortality {
 
     }
 
-
+    public static Integer DeathYears(Optional<PersonInfo> personInfo) {
+        return caculateDeathAge(personInfo.get().getGender(), personInfo.get().getBirthYear());
+    }
     public static Integer WorkingYears(Integer retirement, Integer superAge) {
         return retirement - superAge;
     }
