@@ -179,7 +179,15 @@ public class Mortality {
         //write your implementation here
         CompletableFuture<Optional<PersonInfo>> personInfo = CompletableFuture
                 .supplyAsync(() -> PersonInfoSupplier.getPersonInfo(fullName));
+        CompletableFuture<Integer> startSuperAge = CompletableFuture
+                .supplyAsync(SuperannuatationStrategySupplier::getStartSuperAge);
+        CompletableFuture<Integer> retirementAge = CompletableFuture
+                .supplyAsync(RetirementAgeSupplier);
 
+        CompletableFuture<String> strategy = CompletableFuture
+                .supplyAsync(SuperannuatationStrategySupplier::getSuperStrategy);
+        CompletableFuture<Integer> contribution = CompletableFuture
+                .supplyAsync(SuperannuatationStrategySupplier::getContribution);
 
     }
 
