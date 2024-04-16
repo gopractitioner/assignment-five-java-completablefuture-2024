@@ -27,7 +27,7 @@ public class Mortality {
     protected static final String LIFESTYLE_MSG = "You live on %.1f%% of median salary\n";
     protected static Random random = new Random();
     //use debug flag to see the threads in action
-    public static boolean debug = true;
+    public static boolean debug = false;
 
     /*
      *  a helper method that delays the execution of the current thread
@@ -168,13 +168,13 @@ public class Mortality {
 
     }
 
-    public static Integer DeathYears(Optional<PersonInfo> personInfo) {
+    public static Integer DeathYear(Optional<PersonInfo> personInfo) {
         return caculateDeathAge(personInfo.get().getGender(), personInfo.get().getBirthYear());
     }
-    public static Integer WorkingYears(Integer retirement, Integer superAge) {
+    public static Integer WorkingYear(Integer retirement, Integer superAge) {
         return retirement - superAge;
     }
-    public static Integer RetirementYears(Integer retirementAge, Integer DeathAge) {
+    public static Integer RetirementYear(Integer retirementAge, Integer DeathAge) {
         return DeathAge - retirementAge;
     }
     public static Double SuperBalance(String strategy, Integer WorkingYears, Integer contribution) {
@@ -213,23 +213,30 @@ public class Mortality {
         CompletableFuture<Integer> contribution = CompletableFuture
                 .supplyAsync(SuperannuatationStrategySupplier::getContribution);
 
-        CompletableFuture<Integer> WorkingYears = retirementAge.thenCombine(startSuperAge, Mortality::WorkingYears);
-        CompletableFuture<Integer> DeathAge = personInfo.thenApply(Mortality::DeathYears);
+        CompletableFuture<Integer> WorkingYears = retirementAge.thenCombine(startSuperAge, Mortality::WorkingYear);
+        CompletableFuture<Integer> DeathAge = personInfo.thenApply(Mortality::DeathYear);
         CompletableFuture<Double> superPayout = WorkingYears
                 .thenCompose(working_years -> strategy.thenCombine(contribution, (_strategy, _contribution) -> SuperBalance(_strategy, working_years, _contribution)));
         //System.out.println("	 super strategy == " + strategy.get());
 
+        CompletableFuture<Integer> deathAge = personInfo.thenApply(Mortality::DeathYear);
+        CompletableFuture<Integer> retireAge = retirementAge.thenCombine(deathAge, Mortality::RetirementYear);
+
+        CompletableFuture<Double> lifeStyle = retireAge.thenCombine(superPayout, Mortality::LifeStyle);
         try {
             System.out.println("	 start super age=" + startSuperAge.get());
             System.out.println("	 retirement age=" + retirementAge.get());
             System.out.println("Working years=" + WorkingYears.get());
             System.out.println("	 contribution%" + contribution.get());
             System.out.println("	 super strategy==" + strategy.get());
+            System.out.println("Super payout = " + String.format("%.1f", superPayout.get()) + " (median salaries)");
             System.out.println("	 birth year = " + PersonInfoSupplier.getPersonInfo(fullName).get().getBirthYear());
             System.out.println("	 sex=" + PersonInfoSupplier.getPersonInfo(fullName).get().getGender());
 
             System.out.println("Die at " + DeathAge.get());
-            System.out.println("Retirement years = " + retirementAge.get());
+            System.out.println("Retirement years=" + retirementAge.get());
+
+
             //System.out.println("Super payout= %f", superPayout.get());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
