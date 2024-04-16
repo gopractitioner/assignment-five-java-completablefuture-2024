@@ -174,6 +174,9 @@ public class Mortality {
     public static Integer WorkingYears(Integer retirement, Integer superAge) {
         return retirement - superAge;
     }
+    public static Integer retire(Integer retirementAge, Integer DeathAge) {
+        return DeathAge - retirementAge;
+    }
 
 
     /**
