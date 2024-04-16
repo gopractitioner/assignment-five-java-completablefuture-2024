@@ -177,6 +177,13 @@ public class Mortality {
     public static Integer RetirementYears(Integer retirementAge, Integer DeathAge) {
         return DeathAge - retirementAge;
     }
+    public static Double SuperBalance(String strategy, Integer WorkingYears, Integer contribution) {
+        Double balance = 0.0;
+        for (int i = 0; i < WorkingYears; i++) {
+            balance = balance * performance(strategy) + contribution / 100.0;
+        }
+        return balance;
+    }
 
 
     /**
@@ -207,10 +214,19 @@ public class Mortality {
                 .supplyAsync(SuperannuatationStrategySupplier::getContribution);
 
         CompletableFuture<Integer> WorkingYears = retirementAge.thenCombine(startSuperAge, Mortality::WorkingYears);
+
+        CompletableFuture<Double> superPayout = WorkingYears
+                .thenCompose(working_years -> strategy.thenCombine(contribution, (_strategy, _contribution) -> SuperBalance(_strategy, working_years, _contribution)));
+        //System.out.println("	 super strategy == " + strategy.get());
+
         try {
             System.out.println("	 start super age=" + startSuperAge.get());
             System.out.println("	 retirement age=" + retirementAge.get());
-            System.out.println("Working years = " + WorkingYears.get());
+            System.out.println("Working years=" + WorkingYears.get());
+            System.out.println("	 contribution%" + contribution.get());
+            System.out.println("	 super strategy==" + strategy.get());
+
+            //System.out.println("Super payout= %f", superPayout.get());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
