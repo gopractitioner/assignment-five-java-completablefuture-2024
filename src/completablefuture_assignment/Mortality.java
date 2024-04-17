@@ -184,7 +184,9 @@ public class Mortality {
         }
         return balance;
     }
-
+    public static Double LifeStyle(Integer retirementYear, Double superPayout) {
+        return 1.0*superPayout / retirementYear;
+    }
 
     /**
      * @param fullName a person's name
@@ -219,24 +221,25 @@ public class Mortality {
                 .thenCompose(working_years -> strategy.thenCombine(contribution, (_strategy, _contribution) -> SuperBalance(_strategy, working_years, _contribution)));
         //System.out.println("	 super strategy == " + strategy.get());
 
-        CompletableFuture<Integer> deathAge = personInfo.thenApply(Mortality::DeathYear);
-        CompletableFuture<Integer> retireAge = retirementAge.thenCombine(deathAge, Mortality::RetirementYear);
+        CompletableFuture<Integer> retireYears = retirementAge.thenCombine(DeathAge, Mortality::RetirementYear);
 
-        CompletableFuture<Double> lifeStyle = retireAge.thenCombine(superPayout, Mortality::LifeStyle);
+        CompletableFuture<Double> lifeStyle = retireYears.thenCombine(superPayout, Mortality::LifeStyle);
         try {
             System.out.println("	 start super age=" + startSuperAge.get());
             System.out.println("	 retirement age=" + retirementAge.get());
             System.out.println("Working years=" + WorkingYears.get());
-            System.out.println("	 contribution%" + contribution.get());
+            System.out.println("	 contribution%=" + contribution.get());
             System.out.println("	 super strategy==" + strategy.get());
-            System.out.println("Super payout = " + String.format("%.1f", superPayout.get()) + " (median salaries)");
+            System.out.println("Super payout=" + String.format("%.1f", superPayout.get()) + " (median salaries)");
             System.out.println("	 birth year = " + PersonInfoSupplier.getPersonInfo(fullName).get().getBirthYear());
             System.out.println("	 sex=" + PersonInfoSupplier.getPersonInfo(fullName).get().getGender());
 
             System.out.println("Die at " + DeathAge.get());
-            System.out.println("Retirement years=" + retirementAge.get());
-
-
+            //System.out.println("Retirement years=" + (int)DeathAge.get() - (int)retirementAge.get());
+            //System.out.println("Retirement years = " + String.format("%d", D)- String.format("%d", retirementAge.get()));
+            System.out.println("Retirement years = " + retireYears.get());
+            System.out.println("You live on " + String.format("%.1f", lifeStyle.get() * 100.0) + "% of median salary");
+            displayResult(lifeStyle.get());
             //System.out.println("Super payout= %f", superPayout.get());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -245,7 +248,7 @@ public class Mortality {
         }
         /*CompletableFuture<Integer> deathAge = personInfo.thenApply(Mortality::DeathYears);
 
-     */
+         */
 
 
     }
